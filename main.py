@@ -328,32 +328,10 @@ async def mobileUnlock(device=Depends(verifyMobileAuth)):
     if device["userCanUnlock"] == 0:
         conn.close()
         raise HTTPException(status_code=403, detail="Device is not allowed to unlock")
-    if needLockApproval:
-        cur.execute("SELECT pendingLockTime FROM devices WHERE deviceId = ?", (deviceId,))
-        row = cur.fetchone()
-        pendingLockTime = row["pendingLockTime"]
-        if pendingLockTime is None:
-            cur.execute("UPDATE devices SET pendingLockTime = ? WHERE deviceId = ?", (now.isoformat(), deviceId))
-            conn.commit()
-            conn.close()
-            return JSONResponse(status_code=201, content={"detail": "Unlock request received. Please confirm within the approval window."})
-        else:
-            prevTime = datetime.fromisoformat(pendingLockTime)
-            if (now - prevTime).total_seconds() <= lockApprovalTimeSecond:
-                cur.execute("UPDATE devices SET emergencyState = 0, pendingLockTime = NULL, lastSeen = ? WHERE deviceId = ?", (now.isoformat(), deviceId))
-                conn.commit()
-                conn.close()
-                return {"detail": "Device unlocked"}
-            else:
-                cur.execute("UPDATE devices SET pendingLockTime = NULL WHERE deviceId = ?", (deviceId,))
-                conn.commit()
-                conn.close()
-                raise HTTPException(status_code=408, detail="Unlock approval timeout. Please try again.")
-    else:
-        cur.execute("UPDATE devices SET emergencyState = 0, lastSeen = ? WHERE deviceId = ?", (now.isoformat(), deviceId))
-        conn.commit()
-        conn.close()
-        return {"detail": "Device unlocked"}
+    cur.execute("UPDATE devices SET emergencyState = 0, pendingLockTime = NULL, lastSeen = ? WHERE deviceId = ?", (now.isoformat(), deviceId))
+    conn.commit()
+    conn.close()
+    return {"detail": "Device unlocked"}
 
 
 @app.post("/admin/register", response_model=AdminRegisterResponse)
