@@ -27,7 +27,6 @@ adminToken = config.get("server", "adminToken", fallback="supersecretadmin")
 hmacWindow = config.getint("security", "hmacWindow", fallback=5)
 host = config.get("server", "host", fallback="127.0.0.1")
 port = config.getint("server", "port", fallback=8000)
-print(port, adminToken)
 
 DB_PATH = "devices.db"
 
