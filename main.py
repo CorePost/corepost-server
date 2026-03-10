@@ -110,7 +110,7 @@ async def verifyClientAuth(
     device = get_client_device(x_deviceid)
     if device is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Device not found")
-    token = device["token"]
+    token = device["deviceId"]
     if not verify_hmac(token, x_timestamp, x_signature):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid HMAC signature")
     return device
@@ -127,7 +127,7 @@ async def verifyMobileAuth(
     device = get_mobile_device_by_emergency(x_emergencyid)
     if device is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Device not found")
-    token = device["token"]
+    token = device["emergencyId"]
     if not verify_hmac(token, x_timestamp, x_signature):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid HMAC signature")
     return device
