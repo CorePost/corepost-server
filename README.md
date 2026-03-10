@@ -75,7 +75,7 @@ set +a
 python main.py
 ```
 
-Сервер поднимется на настроенном хосте и порту `COREPOST_HOST:COREPOST_PORT`, а OpenAPI будет доступен по пути `/openapi.json`.
+Сервер слушает `COREPOST_PORT`, а OpenAPI публикуется по пути `COREPOST_OPENAPI_PATH`.
 
 ## Тесты
 
@@ -115,8 +115,8 @@ import http.client
 import os
 
 conn = http.client.HTTPConnection(
-    os.environ["COREPOST_PUBLIC_HOST"],
-    int(os.environ["COREPOST_PUBLIC_PORT"]),
+    os.environ["COREPOST_HEALTHCHECK_HOST"],
+    int(os.environ["COREPOST_SERVER_PORT"]),
     timeout=3,
 )
 conn.request("GET", os.environ["COREPOST_HEALTHCHECK_PATH"])
@@ -124,7 +124,8 @@ print(conn.getresponse().read().decode())
 PY
 ```
 
-Для smoke-проверок и OpenAPI используйте `COREPOST_PUBLIC_HOST`, `COREPOST_PUBLIC_PORT`, `COREPOST_HEALTHCHECK_PATH` и `COREPOST_OPENAPI_PATH`.
+Для smoke-проверок используйте `COREPOST_HEALTHCHECK_HOST`, `COREPOST_SERVER_PORT` и `COREPOST_HEALTHCHECK_PATH`.
+OpenAPI доступен на том же host/port по пути `COREPOST_OPENAPI_PATH`.
 
 Для независимых инстансов достаточно менять:
 

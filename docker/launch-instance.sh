@@ -27,9 +27,10 @@ docker compose -p "$project_name" --env-file "$env_file" up --build --wait -d
 
 port="$(grep '^COREPOST_SERVER_PORT=' "$env_file" | cut -d= -f2)"
 token="$(grep '^COREPOST_ADMIN_TOKEN=' "$env_file" | cut -d= -f2)"
+openapi_path="$(awk -F= '/^COREPOST_OPENAPI_PATH=/{print $2; found=1} END{if (!found) print "/openapi.json"}' "$env_file")"
 
 echo "instance=$instance"
 echo "project=$project_name"
 echo "port=$port"
 echo "admin_token=$token"
-echo "openapi_path=/openapi.json"
+echo "openapi_path=$openapi_path"
