@@ -4,4 +4,6 @@ __pycache__/
 *.pyc
 .env
 data/
+docker/data/
+corepost.db
 *.egg-info/

@@ -19,7 +19,7 @@ cd "$repo_root"
 project_name="$(grep '^COREPOST_PROJECT_NAME=' "$env_file" | cut -d= -f2)"
 data_dir="$(grep '^COREPOST_DATA_DIR=' "$env_file" | cut -d= -f2)"
 mkdir -p "$repo_root/${data_dir#./}"
-docker compose -p "$project_name" --env-file "$env_file" up --build -d
+docker compose -p "$project_name" --env-file "$env_file" up --build --wait -d
 
 port="$(grep '^COREPOST_SERVER_PORT=' "$env_file" | cut -d= -f2)"
 token="$(grep '^COREPOST_ADMIN_TOKEN=' "$env_file" | cut -d= -f2)"
@@ -28,4 +28,4 @@ echo "instance=$instance"
 echo "project=$project_name"
 echo "port=$port"
 echo "admin_token=$token"
-echo "openapi=http://127.0.0.1:${port}/openapi.json"
+echo "openapi_path=/openapi.json"

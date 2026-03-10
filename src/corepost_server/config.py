@@ -40,7 +40,7 @@ class Settings:
     @classmethod
     def from_env(cls) -> "Settings":
         data_root = Path(os.getenv("COREPOST_DATA_DIR", ".")).resolve()
-        db_path = Path(os.getenv("COREPOST_DB_PATH", str(data_root / "data" / "corepost.db"))).resolve()
+        db_path = Path(os.getenv("COREPOST_DB_PATH", str(data_root / "corepost.db"))).resolve()
         db_path.parent.mkdir(parents=True, exist_ok=True)
 
         return cls(

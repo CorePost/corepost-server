@@ -5,9 +5,12 @@ services:
     container_name: ${COREPOST_CONTAINER_NAME:-corepost-server}
     environment:
       COREPOST_ADMIN_TOKEN: ${COREPOST_ADMIN_TOKEN:-change-me-corepost-admin}
-      COREPOST_DB_PATH: /data/corepost.db
-      COREPOST_HOST: 0.0.0.0
-      COREPOST_PORT: 8000
+      COREPOST_DATA_DIR: ${COREPOST_DATA_DIR:-./data}
+      COREPOST_DB_PATH: ${COREPOST_DB_PATH:-./data/corepost.db}
+      COREPOST_HOST: ${COREPOST_HOST:-0.0.0.0}
+      COREPOST_PORT: ${COREPOST_PORT:-8000}
+      COREPOST_HEALTHCHECK_HOST: ${COREPOST_HEALTHCHECK_HOST:-localhost}
+      COREPOST_HEALTHCHECK_PATH: ${COREPOST_HEALTHCHECK_PATH:-/healthz}
       COREPOST_REQUIRE_REGISTRATION_APPROVAL: ${COREPOST_REQUIRE_REGISTRATION_APPROVAL:-false}
       COREPOST_REQUIRE_HWID: ${COREPOST_REQUIRE_HWID:-false}
       COREPOST_REQUIRE_LOCK_CONFIRMATION: ${COREPOST_REQUIRE_LOCK_CONFIRMATION:-true}
@@ -17,11 +20,17 @@ services:
       COREPOST_AGENT_ACTION_WHEN_LOCKED: ${COREPOST_AGENT_ACTION_WHEN_LOCKED:-shutdown}
       COREPOST_AGENT_ACTION_WHEN_RESTRICTED: ${COREPOST_AGENT_ACTION_WHEN_RESTRICTED:-lock_session}
     ports:
-      - "${COREPOST_SERVER_PORT:-8000}:8000"
+      - "${COREPOST_SERVER_PORT:-8000}:${COREPOST_PORT:-8000}"
     volumes:
-      - ${COREPOST_DATA_DIR:-./data}:/data
+      - ${COREPOST_DATA_DIR:-./data}:/app/data
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz').read()"]
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import http.client, os; conn = http.client.HTTPConnection(os.environ['COREPOST_HEALTHCHECK_HOST'], int(os.environ['COREPOST_PORT']), timeout=3); conn.request('GET', os.environ.get('COREPOST_HEALTHCHECK_PATH', '/healthz')); response = conn.getresponse(); raise SystemExit(0 if response.status == 200 else 1)",
+        ]
       interval: 10s
       timeout: 3s
       retries: 5

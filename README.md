@@ -75,7 +75,7 @@ set +a
 python main.py
 ```
 
-Сервер поднимется на `http://127.0.0.1:${COREPOST_PORT:-8000}`, OpenAPI будет доступен по `http://127.0.0.1:${COREPOST_PORT:-8000}/openapi.json`.
+Сервер поднимется на настроенном хосте и порту `COREPOST_HOST:COREPOST_PORT`, а OpenAPI будет доступен по пути `/openapi.json`.
 
 ## Тесты
 
@@ -87,7 +87,7 @@ pip install -e .[dev]
 pytest
 ```
 
-Покрыты ключевые сценарии из ПЗ:
+Покрыты ключевые сценарии:
 
 - регистрация;
 - штатный heartbeat/decrypt;
@@ -105,10 +105,26 @@ pytest
 ```bash
 cd corepost-server
 cp .env.example .env
-docker compose up --build -d
+set -a
+source .env
+set +a
+docker compose up --build --wait -d
 docker compose ps
-curl http://127.0.0.1:${COREPOST_SERVER_PORT:-8000}/healthz
+python - <<'PY'
+import http.client
+import os
+
+conn = http.client.HTTPConnection(
+    os.environ["COREPOST_PUBLIC_HOST"],
+    int(os.environ["COREPOST_PUBLIC_PORT"]),
+    timeout=3,
+)
+conn.request("GET", os.environ["COREPOST_HEALTHCHECK_PATH"])
+print(conn.getresponse().read().decode())
+PY
 ```
+
+Для smoke-проверок и OpenAPI используйте `COREPOST_PUBLIC_HOST`, `COREPOST_PUBLIC_PORT`, `COREPOST_HEALTHCHECK_PATH` и `COREPOST_OPENAPI_PATH`.
 
 Для независимых инстансов достаточно менять:
 

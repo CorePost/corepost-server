@@ -13,7 +13,7 @@ from corepost_server.security import compute_signature
 def build_client(tmp_path: Path) -> TestClient:
     settings = Settings(
         app_name="CorePost Server Test",
-        host="127.0.0.1",
+        host="test-host",
         port=8000,
         log_level="info",
         admin_token="test-admin",
