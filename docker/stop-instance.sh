@@ -17,4 +17,8 @@ fi
 
 cd "$repo_root"
 project_name="$(grep '^COREPOST_PROJECT_NAME=' "$env_file" | cut -d= -f2)"
-docker compose -p "$project_name" --env-file "$env_file" down
+data_dir="$(grep '^COREPOST_DATA_DIR=' "$env_file" | cut -d= -f2)"
+data_path="$repo_root/${data_dir#./}"
+
+docker compose -p "$project_name" --env-file "$env_file" down --remove-orphans
+rm -rf "$data_path"

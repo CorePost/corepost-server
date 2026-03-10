@@ -18,7 +18,11 @@ fi
 cd "$repo_root"
 project_name="$(grep '^COREPOST_PROJECT_NAME=' "$env_file" | cut -d= -f2)"
 data_dir="$(grep '^COREPOST_DATA_DIR=' "$env_file" | cut -d= -f2)"
-mkdir -p "$repo_root/${data_dir#./}"
+data_path="$repo_root/${data_dir#./}"
+
+docker compose -p "$project_name" --env-file "$env_file" down --remove-orphans >/dev/null 2>&1 || true
+rm -rf "$data_path"
+mkdir -p "$data_path"
 docker compose -p "$project_name" --env-file "$env_file" up --build --wait -d
 
 port="$(grep '^COREPOST_SERVER_PORT=' "$env_file" | cut -d= -f2)"
